@@ -1,0 +1,37 @@
+name: Release
+
+# A tag like v0.2.0 builds, tests and publishes that version. The version is
+# written down once, in Directory.Build.props; a tag that names another is
+# refused, since two binaries answering to one number is a thing no update
+# check can tell apart.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Check the version
+        shell: pwsh
+        run: |
+          $version = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version
+          $tag = "${{ github.ref_name }}".TrimStart('v')
+          if ($version -ne $tag) { throw "Tag $tag does not match Directory.Build.props ($version)." }
+      - name: Suite and build
+        shell: pwsh
+        run: ./build.ps1 -Zip
+      - name: Publish
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" (Get-ChildItem dist/*.zip, dist/*.sha256).FullName `
+            --title "Claude Graft for Windows ${{ github.ref_name }}" --generate-notes

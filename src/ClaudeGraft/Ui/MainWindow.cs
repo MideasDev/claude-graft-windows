@@ -154,10 +154,13 @@ sealed class MainWindow : Form
         get { var p = base.CreateParams; p.ExStyle |= Theme.Composited; return p; }
     }
 
+    string footerLine = "";
+
     void OnChanged()
     {
         if (IsDisposed) return;
         Mine();
+        if (app.Updates.ClaudeLine() != footerLine) { footerLine = app.Updates.ClaudeLine(); BuildFooter(); }
         BuildSidebar();
         if (selected != shownKey) Show(selected); else RefreshLive();
     }
@@ -284,13 +287,21 @@ sealed class MainWindow : Form
     {
         footer.Controls.Clear();
         var line = new Panel { Dock = DockStyle.Top, Height = 1, BackColor = Theme.Line };
-        var version = ClaudeProcesses.DesktopVersion();
+        // Red only for a release waiting to be installed, the one state that
+        // asks somebody to act; a click on it starts the update.
+        var available = app.Updates.ClaudeAvailable;
         var desktop = new Strip(S(46)) { Dock = DockStyle.Top, Padding = new Padding(S(16), 0, S(10), 0) };
-        var glyph = new TextLabel(Theme.GSync, Theme.Icon, Theme.SubText);
+        var glyph = new TextLabel(Theme.GSync, Theme.Icon, available ? Theme.Red : Theme.SubText);
         var words = new FlowLayoutPanel { FlowDirection = FlowDirection.TopDown, AutoSize = true, BackColor = Color.Transparent, WrapContents = false };
         words.Controls.Add(new TextLabel("Claude Desktop", Theme.BodyBold));
-        words.Controls.Add(new TextLabel(version ?? (ClaudeInstall.Executable != null ? S_("Installed") : S_("Not installed")), Theme.Small, Theme.SubText));
+        words.Controls.Add(new TextLabel(app.Updates.ClaudeLine(), Theme.Small, available ? Theme.Red : Theme.SubText));
         desktop.Left(glyph, S(10)).Left(words);
+        var check = new FlatButton("", FlatButton.Kind.Quiet, Theme.GRefresh);
+        tips.SetToolTip(check, available ? S_("Update Claude…") : S_("Check for a new Claude"));
+        check.Click += async (_, _) => { if (app.Updates.ClaudeAvailable) await app.Updates.UpdateClaude(this); else await app.Updates.CheckClaude(); };
+        desktop.Right(check, 0);
+        foreach (Control c in new Control[] { glyph, words, desktop })
+            if (available) { c.Cursor = Cursors.Hand; c.Click += async (_, _) => await app.Updates.UpdateClaude(this); }
         var links = new Strip(S(40)) { Dock = DockStyle.Bottom, Padding = new Padding(S(8), 0, S(8), S(4)) };
         var settings = new FlatButton(S_("Settings"), FlatButton.Kind.Quiet, Theme.GSettings);
         settings.Click += (_, _) => app.ShowSettings();

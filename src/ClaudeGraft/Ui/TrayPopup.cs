@@ -26,7 +26,7 @@ sealed class TrayPopup : Form
                       $"{Countdown.Until(f?.WeekReset, now)}|{(f == null ? 0 : (int)(now - f.Taken).TotalMinutes)}|{app.Monitor.Note(e.ProfileDir)}");
         }
         foreach (var (session, title, _) in app.Pool.Conversations()) parts.Add($"{session.Id}|{title}|{session.ServedBy}");
-        parts.Add($"{SafeStartup()}|{app.Store.Data.LiveUsage}");
+        parts.Add($"{SafeStartup()}|{app.Store.Data.LiveUsage}|{app.Updates.ClaudeLine()}");
         return string.Join("\n", parts);
     }
     Point anchor;
@@ -87,7 +87,10 @@ sealed class TrayPopup : Form
         var top = new Strip(Px(34)) { Width = Inner };
         top.Left(new TextLabel(Theme.GSync, Theme.Icon, Theme.SubText), Px(8));
         top.Left(new TextLabel("Claude Desktop", Theme.BodyBold), Px(6));
-        top.Left(new TextLabel(ClaudeProcesses.DesktopVersion() ?? "", Theme.Small, Theme.Faint));
+        var waiting = app.Updates.ClaudeAvailable;
+        var line = new TextLabel(app.Updates.ClaudeLine(), Theme.Small, waiting ? Theme.Red : Theme.Faint);
+        if (waiting) { line.Cursor = Cursors.Hand; line.Click += async (_, _) => { Hide(); await app.Updates.UpdateClaude(null); }; }
+        top.Left(line);
         var refresh = new FlatButton("", FlatButton.Kind.Quiet, Theme.GRefresh);
         tips.SetToolTip(refresh, S.T("Refresh usage"));
         refresh.Click += (_, _) => { app.Scan(); _ = app.RefreshUsage(Strength.Press); };
@@ -227,7 +230,7 @@ sealed class SettingsWindow : Form
         ForeColor = Theme.Text;
         Font = Theme.Body;
         static int Sc(float px) => Theme.S(px);
-        ClientSize = new Size(Sc(460), Sc(300));
+        ClientSize = new Size(Sc(460), Sc(400));
         Location = new Point(screen.Left + (screen.Width - Width) / 2, screen.Top + (screen.Height - Height) / 2);
         Padding = new Padding(Sc(20));
         HandleCreated += (_, _) => Theme.Chrome(this);
@@ -252,17 +255,47 @@ sealed class SettingsWindow : Form
         {
             if (t.On != app.Store.Data.LiveUsage) app.ToggleLiveUsage();
             t.On = app.Store.Data.LiveUsage;
-        }, line: false);
-        card.Height = Sc(104);
+        });
+        // Claude never updates itself, and so never closes work in progress
+        // to do it; updates are then installed from here.
+        Row(S.T("Update Claude Desktop manually"), Core.Updates.ManualUpdates.Enabled, t =>
+        {
+            if (Core.Updates.ManualUpdates.SetEnabled(t.On) is { } problem)
+            {
+                t.On = Core.Updates.ManualUpdates.Enabled;
+                MessageBox.Show(this, problem, Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else if (t.On) MessageBox.Show(this, S.T("Each Claude stops updating itself the next time it opens. Install new releases from the line at the bottom of Claude Graft's window."), Text);
+        });
+        Row(S.T("Hold Claude Graft updates"), Core.Updates.SelfUpdate.Held, t => Core.Updates.SelfUpdate.Held = t.On, line: false);
+        card.Height = Sc(196);
 
         var note = new TextLabel(S.T("The icon in the notification area keeps reporting usage after this window is closed. Quit it from its own menu."),
-            Theme.Small, Theme.SubText) { Dock = DockStyle.Top, AutoSize = false, Height = Sc(48), Padding = new Padding(Sc(4), Sc(12), 0, 0) };
-        var about = new TextLabel($"Claude Graft for Windows {Application.ProductVersion.Split('+')[0]} · MIT",
+            Theme.Small, Theme.SubText) { Dock = DockStyle.Top, AutoSize = false, Height = Sc(52), Padding = new Padding(Sc(4), Sc(12), 0, 0) };
+        note.MaximumSize = new Size(Sc(410), 0);
+        var about = new TextLabel($"Claude Graft for Windows {Core.Updates.SelfUpdate.Current} · MIT",
             Theme.Small, Theme.Faint) { Dock = DockStyle.Bottom, AutoSize = false, Height = Sc(24) };
+        var graftUpdate = new FlatButton(app.Updates.Graft is { } r ? S.F("Install Claude Graft {0} and restart", r.Version) : S.T("Check for Claude Graft updates"),
+                                         FlatButton.Kind.Quiet, Theme.GRefresh) { Dock = DockStyle.None };
+        graftUpdate.Click += async (_, _) =>
+        {
+            graftUpdate.Enabled = false;
+            if (app.Updates.Graft == null) await app.Updates.CheckGraft(installQuietly: false);
+            if (app.Updates.Graft is { } release)
+            {
+                if (MessageBox.Show(this, S.F("Install Claude Graft {0} and restart it?", release.Version), Text, MessageBoxButtons.OKCancel) == DialogResult.OK
+                    && await app.Updates.InstallGraft() is { } problem)
+                    MessageBox.Show(this, problem, Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else MessageBox.Show(this, app.Updates.GraftProblem ?? S.F("Claude Graft {0} is the latest release.", Core.Updates.SelfUpdate.Current), Text);
+            graftUpdate.Enabled = true;
+        };
         var logs = new FlatButton(S.T("Open the log folder"), FlatButton.Kind.Quiet, Theme.GLog) { Dock = DockStyle.None };
         logs.Click += (_, _) => TrayApp.OpenFolder(Paths.GraftHome);
-        var logRow = new Panel { Dock = DockStyle.Bottom, Height = Sc(36), BackColor = Color.Transparent };
+        var logRow = new Panel { Dock = DockStyle.Bottom, Height = Sc(72), BackColor = Color.Transparent };
         logRow.Controls.Add(logs);
+        graftUpdate.Location = new Point(0, logs.Bottom + Sc(4));
+        logRow.Controls.Add(graftUpdate);
         Controls.Add(note);
         Controls.Add(card);
         Controls.Add(logRow);

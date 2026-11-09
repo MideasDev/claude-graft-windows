@@ -267,6 +267,43 @@ Not yet seen: a read and a write of a signed-in profile, which needs one
 closed. `ClaudeGraft.exe --sidebar-read <profile> <result file>` reads one
 and writes nothing else.
 
-## Not ported yet
+## Updates
 
-- **Claude update handling**, and Graft's own **self-update**.
+**Claude Desktop.** The original runs Claude's own updater (Squirrel.Mac,
+ShipIt) in a profile of its own and recovers profiles the relaunch left
+closed. On Windows, Claude's updater is Electron's MSIX one, and three
+things were measured instead:
+
+- The update feed answers anonymously:
+  `api.anthropic.com/api/desktop/win32/<arch>/msix/update?device_id=…&version=…`
+  gives the current version, the package's address on `downloads.claude.ai`,
+  its SHA-256 and size. Claude Graft asks it with a device identifier of its
+  own, at start and hourly, and never with an account.
+- The configuration library Claude reads `disableAutoUpdates` from is one
+  for every Claude on Windows: Claude's code asks for
+  `%LOCALAPPDATA%\Claude-3p\configLibrary` whatever `--user-data-dir` says.
+  Manual update mode writes there, journalling only the keys it changes and
+  putting them back when turned off, and refuses when
+  `HKLM`/`HKCU\SOFTWARE\Policies\Claude` holds a policy or the
+  configuration comes from elsewhere, as the original refuses managed
+  preferences.
+- Installing is Windows' own: the package is downloaded, its size and SHA-256
+  checked against the feed, and `Add-AppxPackage` installs it, only with
+  every Claude closed. Nothing is ever force quit. Success is the installed
+  version changing, not the package being installed. The Store build
+  (`AnthropicPBC.Claude_…`) and the classic installer are left to their own
+  updaters.
+
+Not ported: the original's update recovery (reopening profiles an updater's
+relaunch left closed), which answers ShipIt's relaunch on macOS; with manual
+mode on, updates on Windows only ever run with every Claude closed.
+
+**Claude Graft itself** updates from this repository's GitHub releases: the
+release's `ClaudeGraft-<version>-win-x64.zip`, checked against the SHA-256
+GitHub records for the upload (or the `.sha256` beside it), only from this
+repository's download address. The running executable is renamed beside the
+new one, which Windows allows where overwriting is refused, and the relay
+started from the old one is replaced by the new as on macOS. It installs
+itself quietly, never while the window is open, unless held. A tag `v<version>`
+matching `Directory.Build.props` builds and publishes a release
+(`.github/workflows/release.yml`).

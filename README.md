@@ -118,6 +118,25 @@ Las cifras salen del historial que cada Claude escribe mientras está abierto
 Anthropic**, se consultan además en el mismo servicio que usa Claude Code, y
 están al día aunque ese Claude lleve días cerrado.
 
+## Actualizaciones
+
+Claude Graft mira cada hora si hay una versión nueva de Claude Desktop, con un
+identificador propio y sin usar ninguna cuenta, y lo dice abajo en la ventana
+y en el panel del icono. Con **Actualizar Claude Desktop manualmente** (en
+Ajustes) ningún Claude se actualiza solo, y por tanto ninguna actualización
+cierra trabajo a medias; la versión nueva se instala desde esa línea, con
+todos los Claudes cerrados (Claude Graft nunca cierra uno por ti), tras
+comprobar su suma SHA-256. La versión de Microsoft Store la actualiza la Store.
+
+Claude Graft se actualiza solo desde las
+[versiones de este repositorio](https://github.com/MideasDev/claude-graft-windows/releases):
+descarga el zip, comprueba su SHA-256, cambia el ejecutable y se reinicia, sin
+avisar, salvo que actives **Retener las actualizaciones de Claude Graft**.
+
+Para publicar una versión: sube el número en `Directory.Build.props`, haz commit
+y empuja una etiqueta con ese número (`git tag v0.2.0` y `git push origin v0.2.0`).
+GitHub compila, pasa las pruebas y publica el zip con su `.sha256`.
+
 ## Seguro por diseño
 
 Claude Graft solo toca lo que ha creado: sus perfiles, sus iconos y los
@@ -133,7 +152,7 @@ Windows (DPAPI), nunca el de renovación, no escribe nada de vuelta y lo envía
 
 ## Diferencias con la versión de macOS
 
-Esta versión trae lo que hace de Claude Graft lo que es: varios Claudes a la
+Esta versión trae casi todo lo del original: varios Claudes a la
 vez, accesos directos, el uso de cada cuenta en el área de notificación y abrir
 sin duplicar. Algunas partes del original dependen de macOS o son delicadas de
 portar, y no están todavía; [docs/PORTING.md](docs/PORTING.md) explica cuáles,

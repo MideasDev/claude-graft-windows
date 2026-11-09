@@ -12,6 +12,9 @@ sealed class TrayApp : ApplicationContext
     public Store Store { get; private set; }
     public UsageMonitor Monitor { get; } = new();
     public PoolController Pool { get; }
+    public UpdateController Updates { get; }
+    readonly System.Windows.Forms.Timer hourly = new() { Interval = 60 * 60 * 1000 };
+    public bool WindowOpen => window is { IsDisposed: false, Visible: true };
     /// claude.ai accounts for Artifacts, Projects and Search Chats.
     public Web.WebCenter Web { get; } = new();
     public IReadOnlyList<ClaudeProcess> Snapshot { get; private set; } = [];
@@ -37,6 +40,7 @@ sealed class TrayApp : ApplicationContext
     {
         _ = invoker.Handle;
         Pool = new PoolController(this);
+        Updates = new UpdateController(this);
         Store = Store.Load();
         if (inspectOnly) { Scan(); return; }
         if (Store.Broken)
@@ -67,6 +71,15 @@ sealed class TrayApp : ApplicationContext
         _ = RefreshUsage(Strength.Look);
         SquareUp();
         Pool.Tick();
+        // Updates: Claude's feed now and hourly; Claude Graft's own a minute
+        // after starting, so a release does not race a window being opened.
+        Core.Updates.SelfUpdate.SweepPrevious();
+        _ = Updates.CheckClaude();
+        hourly.Tick += (_, _) => _ = Updates.Tick();
+        hourly.Start();
+        var first = new System.Windows.Forms.Timer { Interval = 60_000 };
+        first.Tick += (_, _) => { first.Stop(); first.Dispose(); _ = Updates.CheckGraft(installQuietly: true); };
+        first.Start();
         if (showWindow) ShowWindow();
     }
 
@@ -344,6 +357,7 @@ sealed class TrayApp : ApplicationContext
             tray.Dispose();
             menu.Dispose();
             tick.Dispose();
+            hourly.Dispose();
             front.Dispose();
             showSignal?.Dispose();
             invoker.Dispose();

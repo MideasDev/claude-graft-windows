@@ -309,6 +309,9 @@ try
     PoolEnvironmentTests.Run(check, sandbox);
     PoolEnvironmentTests.RunMembers(check, store, main, now);
 
+    // ---- Updates ----
+    UpdateTests.Run(check, sandbox);
+
     // ---- Pinned chats ----
     SidebarTests.Run(check, sandbox, main);
 

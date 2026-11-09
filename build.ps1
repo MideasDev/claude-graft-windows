@@ -30,6 +30,10 @@ if ($Zip) {
     $flavour = if ($SelfContained) { "$Runtime-selfcontained" } else { $Runtime }
     $archive = Join-Path $out "ClaudeGraft-$version-$flavour.zip"
     Compress-Archive -Path (Join-Path $out 'ClaudeGraft.exe'), LICENSE, README.md -DestinationPath $archive -Force
+    # Beside the zip, its SHA-256, which Claude Graft checks before updating
+    # itself (GitHub also records one for each upload).
+    $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+    Set-Content -Path "$archive.sha256" -Value "$hash  $(Split-Path $archive -Leaf)" -NoNewline -Encoding ascii
     Write-Host "Packed $archive"
 }
 Write-Host "Built $out\ClaudeGraft.exe ($version)"
