@@ -29,7 +29,7 @@ if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed.' }
 if ($Zip) {
     $flavour = if ($SelfContained) { "$Runtime-selfcontained" } else { $Runtime }
     $archive = Join-Path $out "ClaudeGraft-$version-$flavour.zip"
-    Compress-Archive -Path (Join-Path $out 'ClaudeGraft.exe'), LICENSE, README.md -DestinationPath $archive -Force
+    Compress-Archive -Path (Join-Path $out 'ClaudeGraft.exe'), LICENSE, README.md, README.es.md -DestinationPath $archive -Force
     # Beside the zip, its SHA-256, which Claude Graft checks before updating
     # itself (GitHub also records one for each upload).
     $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()

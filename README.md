@@ -1,176 +1,179 @@
 <div align="center">
 
-<img src="docs/icon.png" width="96" alt="Claude Graft para Windows">
+<img src="docs/icon.png" width="96" alt="Claude Graft for Windows">
 
-<h1>Claude Graft para Windows</h1>
+<h1>Claude Graft for Windows</h1>
 
-<p><b>Un inicio de sesión de Claude nunca es la cantidad justa.</b><br>
-Todas tus cuentas de Claude, a la vez, cada una en su propio perfil.</p>
+<p><b>One Claude login is never the right number.</b><br>
+All your Claude accounts, at once, each in its own profile.</p>
+
+<p><a href="README.es.md">Leer en español</a></p>
 
 </div>
 
-Claude Graft para Windows es una versión para Windows de
-[Claude Graft](https://github.com/aaditya-v-more/claude-graft), de Aaditya More,
-que en macOS vive en la barra de menús. Aquí vive en el área de notificación:
-ejecuta varias copias de Claude Desktop una al lado de la otra, cada una con
-su propia sesión, sus chats y sus ajustes, y te dice cuánto uso le queda a
-cada cuenta.
+Claude Graft for Windows is a Windows version of
+[Claude Graft](https://github.com/aaditya-v-more/claude-graft) by Aaditya More,
+which lives in the macOS menu bar. Here it lives in the notification area: it
+runs several copies of Claude Desktop side by side, each with its own sign-in,
+chats and settings, and tells you how much usage each account has left.
 
-## Instalación
+## Installing
 
-Necesitas Windows 10 1809 o posterior, [Claude Desktop](https://claude.ai/download)
-(la versión de Microsoft Store o la del instalador clásico) y el
+You need Windows 10 1809 or later, [Claude Desktop](https://claude.ai/download)
+(the Microsoft Store version or the classic installer) and the
 [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0),
-salvo que uses la compilación autocontenida.
+unless you use the self-contained build.
 
-Descarga `ClaudeGraft.exe` de Releases, ponlo en una carpeta tuya (por ejemplo
-`%LOCALAPPDATA%\Programs\ClaudeGraft`) y ábrelo. Como no está firmado,
-SmartScreen puede pedirte que confirmes la primera vez (**Más información ›
-Ejecutar de todas formas**).
+Download `ClaudeGraft-<version>-win-x64.zip` from
+[Releases](https://github.com/MideasDev/claude-graft-windows/releases), unpack
+`ClaudeGraft.exe` into a folder of your own (for example
+`%LOCALAPPDATA%\Programs\ClaudeGraft`) and open it. It is not signed, so
+SmartScreen may ask you to confirm the first time (**More info › Run anyway**).
 
-Para compilarlo tú:
+To build it yourself:
 
 ```powershell
-.\build.ps1              # pruebas + dist\ClaudeGraft.exe
+.\build.ps1              # tests + dist\ClaudeGraft.exe
 .\build.ps1 -SelfContained -Zip
 ```
 
-## Un Claude para cada cuenta
+The interface follows Windows' display language: Spanish on a Spanish
+Windows, English everywhere else.
 
-**Nuevo Claude** crea un perfil en `%LOCALAPPDATA%\ClaudeGraft\Profiles\<carpeta>`
-y, si quieres, accesos directos en el escritorio y en el menú Inicio con su
-propio icono y color. Inicias sesión una vez y se queda iniciada. Cada Claude
-tiene sus propios chats, servidores MCP y ajustes; con **Copiar servidores MCP
-del principal**, en el menú **⋯** de su tarjeta, le añades los que tiene tu Claude de siempre, sin tocar los que
-ya tuviera.
+## One Claude per account
 
-Abrir un Claude que ya está abierto lo trae al frente: nunca se arrancan dos
-procesos sobre el mismo perfil, porque los dos escribirían los mismos archivos
-de chat. Un acceso directo de un Claude que ya has quitado no abre ningún otro
-en su lugar.
+**New Claude** creates a profile in `%LOCALAPPDATA%\ClaudeGraft\Profiles\<folder>`
+and, if you like, Desktop and Start menu shortcuts with their own icon and
+colour. You sign in once and it stays signed in. Each Claude has its own
+chats, MCP servers and settings; **Copy MCP servers from main**, in the **⋯**
+menu on its card, adds the ones your usual Claude has, without touching those
+it already had.
 
-## Artefactos, proyectos y chats de todas las cuentas
+Opening a Claude that is already open brings it to the front: two processes
+never run on the same profile, since both would write the same chat files. A
+shortcut to a Claude you have removed opens no other in its place.
 
-En la barra lateral, **Artefactos**, **Proyectos** y **Buscar chats** reúnen lo
-de todas tus cuentas en un sitio. Cada cuenta inicia sesión una vez en
-claude.ai, en una ventana de Claude Graft, con el código que llega por correo,
-y esa sesión vive en un navegador propio de esa cuenta: Claude Graft nunca lee
-su cookie. Los artefactos se pueden abrir, compartir con un enlace, con
-personas o con un grupo (cada persona con su permiso de ver, comentar o
-editar), renombrar, duplicar, eliminar y exportar a Markdown, PDF, Word o su
-código fuente. La búsqueda encuentra chats y sesiones de Code, y solo pregunta
-a claude.ai al pulsar Intro o Buscar.
+## Artifacts, projects and chats across accounts
 
-## Uso compartido
+In the sidebar, **Artifacts**, **Projects** and **Search Chats** gather what
+all your accounts have in one place. Each account signs in to claude.ai once,
+in a Claude Graft window, with the code sent by email, and that session lives
+in a browser of that account's own: Claude Graft never reads its cookie.
+Artifacts can be opened, shared by link, with people or with a group (each
+person with permission to view, comment or edit), renamed, duplicated,
+deleted, and exported to Markdown, PDF, Word or their source code. Search
+finds chats and Code sessions, and only asks claude.ai when you press Enter or
+Search.
 
-Cuando una cuenta se agota, Claude Code sigue con la cuota de otra sin salir
-del Claude en el que estás. En su apartado **Uso compartido**, **Añadir otra cuenta** suma otros Claudes, o
-inicia sesión con otra cuenta que solo preste su cuota. Solo las respuestas del
-modelo salen de la otra cuenta: tus chats, archivos y conectores se quedan
-donde están, y la pestaña Chat nunca se comparte.
+## Shared usage
 
-Responde la cuenta cuya semana se reinicia antes y que aún tiene margen; una
-conversación se queda en la cuenta que la empezó mientras dura su caché, y
-desde el menú del área de notificación puedes mover cualquier conversación
-reciente a otra cuenta. Funciona con un pequeño relé en `127.0.0.1:47823`
-con un certificado que solo puede responder por `api.anthropic.com`; Claude
-Graft lo pone en marcha y lo para, y configura Claude Code cuando ese Claude
-está cerrado, así que los cambios se aplican la próxima vez que se abre.
+When one account runs out, Claude Code carries on with another's quota
+without leaving the Claude you are in. In its **Shared usage** section, **Add
+another account** brings in other Claudes, or signs in with another account
+that only lends its quota. Only the model's replies come from the other
+account: your chats, files and connectors stay where they are, and the Chat
+tab is never shared.
 
-## Compartir chats
+The account whose week resets soonest and still has room answers; a
+conversation stays with the account that started it while its cache lasts,
+and from the notification-area menu you can move any recent conversation to
+another account. It works through a small relay on `127.0.0.1:47823` with a
+certificate that can only answer for `api.anthropic.com`; Claude Graft starts
+and stops it, and configures Claude Code while that Claude is closed, so
+changes apply the next time it opens.
 
-Un Claude nuevo empieza con sus propios chats. En **Lee los chats de** puedes hacer que
-lea los de tu Claude principal o los de otro Claude: recibe su propia copia de
-esos chats, y cada vez que se abre cualquiera de los dos los cambios viajan en
-ambos sentidos (un chat nuevo, uno renombrado, uno borrado). Sus propios chats
-se añaden también a los del otro, y esa fusión es lo único que no se puede
-deshacer; volver a **Sus propios chats** lo deja exactamente con los suyos,
-después de entregarle al otro lo que hiciste mientras tanto. Funciona entre
-dos perfiles de la misma cuenta y entre cuentas distintas.
+## Sharing chats
 
-Los chats de Code fijados, su orden y cómo se ordenan también se sincronizan
-entre los dos, justo antes de abrir uno, siempre que todos los que comparten
-esos chats estén cerrados.
+A new Claude starts with its own chats. Under **Reads chats from** you can have
+it read your main Claude's chats or another Claude's: it gets its own copy of
+those chats, and each time either one opens, changes travel both ways (a new
+chat, a renamed one, a deleted one). Its own chats are added to the other's
+too, and that merge is the one thing that cannot be undone; going back to
+**Its own chats** leaves it with exactly its own, after handing the other what
+you did in the meantime. It works between two profiles of the same account and
+between different accounts.
 
-Si abres un Claude mientras otro con los mismos chats está abierto, Claude
-Graft te avisa antes, porque abrir la misma conversación en dos a la vez puede
-perder mensajes. Y si al cambiar de cuenta dentro de un Claude sus chats se
-quedaron en otro perfil, la ventana te dice dónde están y te deja copiarlos.
+Pinned Code chats, their order and how they are sorted are synchronised
+between the two as well, just before one opens, as long as every Claude
+sharing those chats is closed.
 
-## El área de notificación
+If you open a Claude while another with the same chats is open, Claude Graft
+warns you first, because opening the same conversation in two at once can lose
+messages. And if switching accounts inside a Claude left its chats in another
+profile, the window tells you where they are and lets you copy them.
 
-Un clic en el icono abre un panel, como el menú del original: cada Claude con
-su uso y un botón **Abrir**, las conversaciones del uso compartido, los
-interruptores de **Iniciar con Windows** y del uso en vivo, y las acciones. El
-clic derecho abre un menú corto. La ventana sigue el modelo del original: los
-Claudes en una barra lateral y, a la derecha, el elegido en tarjetas.
+## The notification area
 
+Clicking the icon opens a panel, like the original's menu: each Claude with
+its usage and an **Open** button, the shared-usage conversations, the **Start
+with Windows** and live-usage switches, and the actions. Right-click opens a
+short menu. The window follows the original's layout: the Claudes in a
+sidebar and, on the right, the chosen one in cards.
 
-El icono toma el color del Claude que tienes delante y muestra el uso de su
-cuenta: el porcentaje de la ventana de cinco horas, o el de la semana (con una
-raya debajo) en las cuentas que solo tienen límite semanal. El menú lista todos
-los Claudes, cuáles están abiertos y el uso de cada uno, con el tiempo que
-falta para que se reinicie en la información emergente. Un clic abre o trae al
-frente cualquiera de ellos.
+The icon takes the colour of the Claude in front of you and shows its
+account's usage: the five-hour window's percentage, or the week's (with a bar
+underneath) for accounts that only have a weekly limit. The menu lists every
+Claude, which are open and how much each has used, with the time until it
+resets in the tooltip. A click opens or brings forward any of them.
 
-Las cifras salen del historial que cada Claude escribe mientras está abierto
-(`plan-usage-history.json`). Si activas **Leer el uso en vivo desde
-Anthropic**, se consultan además en el mismo servicio que usa Claude Code, y
-están al día aunque ese Claude lleve días cerrado.
+The figures come from the history each Claude writes while it is open
+(`plan-usage-history.json`). Turn on **Read live usage from Anthropic** and
+they are also asked of the same service Claude Code uses, so they are current
+even if that Claude has been closed for days.
 
-## Actualizaciones
+## Updates
 
-Claude Graft mira cada hora si hay una versión nueva de Claude Desktop, con un
-identificador propio y sin usar ninguna cuenta, y lo dice abajo en la ventana
-y en el panel del icono. Con **Actualizar Claude Desktop manualmente** (en
-Ajustes) ningún Claude se actualiza solo, y por tanto ninguna actualización
-cierra trabajo a medias; la versión nueva se instala desde esa línea, con
-todos los Claudes cerrados (Claude Graft nunca cierra uno por ti), tras
-comprobar su suma SHA-256. La versión de Microsoft Store la actualiza la Store.
+Every hour Claude Graft checks whether there is a new Claude Desktop, under an
+identifier of its own and without using any account, and says so at the
+bottom of the window and in the icon's panel. With **Update Claude Desktop
+manually** (in Settings) no Claude updates itself, so no update ever closes
+work in progress; the new version installs from that line, with every Claude
+closed (Claude Graft never closes one for you), after its SHA-256 is checked.
+The Microsoft Store version is updated by the Store.
 
-Claude Graft se actualiza solo desde las
-[versiones de este repositorio](https://github.com/MideasDev/claude-graft-windows/releases):
-descarga el zip, comprueba su SHA-256, cambia el ejecutable y se reinicia, sin
-avisar, salvo que actives **Retener las actualizaciones de Claude Graft**.
+Claude Graft updates itself from
+[this repository's releases](https://github.com/MideasDev/claude-graft-windows/releases):
+it downloads the zip, checks its SHA-256, swaps the executable and restarts,
+quietly, unless you turn on **Hold Claude Graft updates**.
 
-Para publicar una versión: sube el número en `Directory.Build.props`, haz commit
-y empuja una etiqueta con ese número (`git tag v0.2.0` y `git push origin v0.2.0`).
-GitHub compila, pasa las pruebas y publica el zip con su `.sha256`.
+To publish a version: raise the number in `Directory.Build.props`, commit, and
+push a tag with that number (`git tag v0.2.0` and `git push origin v0.2.0`).
+GitHub builds it, runs the tests and publishes the zip with its `.sha256`.
 
-## Seguro por diseño
+## Safe by design
 
-Claude Graft solo toca lo que ha creado: sus perfiles, sus iconos y los
-accesos directos que él mismo ha hecho. El perfil propio de Claude nunca se
-renombra, se mueve ni se borra; quitar un Claude manda su carpeta a la
-Papelera de reciclaje, nunca la borra sin más, y solo si está dentro de la
-carpeta de perfiles. Una lista que no se puede leer no se sobrescribe.
+Claude Graft only touches what it created: its profiles, its icons and the
+shortcuts it made itself. Claude's own profile is never renamed, moved or
+deleted; removing a Claude sends its folder to the Recycle Bin, never deletes
+it outright, and only if it lies inside the profiles folder. A list that
+cannot be read is never overwritten.
 
-El uso en vivo toma prestado el inicio de sesión de cada perfil sin quedárselo:
-descifra solo el token de acceso, con la protección de tu propia cuenta de
-Windows (DPAPI), nunca el de renovación, no escribe nada de vuelta y lo envía
-únicamente a `api.anthropic.com`. Está desactivado hasta que lo activas.
+Live usage borrows each profile's sign-in without keeping it: it decrypts
+only the access token, with your own Windows account's protection (DPAPI),
+never the refresh token, writes nothing back, and sends it only to
+`api.anthropic.com`. It is off until you turn it on.
 
-## Diferencias con la versión de macOS
+## Differences from the macOS version
 
-Esta versión trae casi todo lo del original: varios Claudes a la
-vez, accesos directos, el uso de cada cuenta en el área de notificación y abrir
-sin duplicar. Algunas partes del original dependen de macOS o son delicadas de
-portar, y no están todavía; [docs/PORTING.md](docs/PORTING.md) explica cuáles,
-por qué y cómo se hizo cada pieza en Windows:
+This version brings over what the original does: several Claudes at once,
+shortcuts, shared chats and pinned chats, shared usage, each account's usage in
+the notification area, opening without duplicating, and updates for Claude and
+for itself. A few pieces answer problems macOS has and Windows does not, and
+are left out on purpose: the sweep that files missing Code session records,
+and the recovery after an updater's relaunch.
+[docs/PORTING.md](docs/PORTING.md) explains why, and how each piece was done
+on Windows.
 
-- sincronizar la barra lateral y gestionar las actualizaciones de Claude.
+Windows groups every Claude window under one taskbar icon, since they are all
+the same app; the notification-area icon tells you which one is in front.
 
-Windows agrupa en la barra de tareas todas las ventanas de Claude bajo un mismo
-icono, porque todas son la misma aplicación; el icono del área de notificación
-dice cuál tienes delante.
+## Help
 
-## Ayuda
+`ClaudeGraft.exe --report` writes `%LOCALAPPDATA%\ClaudeGraft\state-report.txt`
+with what the program sees (where Claude is, which Claudes are open, the usage
+figures), and `diagnostics.log`, in the same folder, records what it has done.
+Neither contains tokens or chats.
 
-`ClaudeGraft.exe --report` escribe `%LOCALAPPDATA%\ClaudeGraft\state-report.txt`
-con lo que ve el programa (dónde está Claude, qué Claudes están abiertos, las
-cifras de uso), y `diagnostics.log`, en la misma carpeta, guarda lo que ha
-hecho. Ninguno de los dos contiene tokens ni chats.
-
-[MIT](LICENSE). Basado en [Claude Graft](https://github.com/aaditya-v-more/claude-graft)
-de Aaditya More; si te resulta útil, su [bote de propinas](https://ko-fi.com/aadityavmore)
-mantiene vivo el original.
+[MIT](LICENSE). Based on [Claude Graft](https://github.com/aaditya-v-more/claude-graft)
+by Aaditya More; if you find it useful, the original's
+[tip jar](https://ko-fi.com/aadityavmore) keeps it going.
