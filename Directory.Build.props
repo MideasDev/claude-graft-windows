@@ -1,0 +1,14 @@
+<Project>
+  <!-- The version is written down once, here, and every project reads it. -->
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Company>Claude Graft for Windows</Company>
+    <Product>Claude Graft for Windows</Product>
+    <Copyright>MIT. Port of Claude Graft by Aaditya Vitthal More.</Copyright>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+</Project>

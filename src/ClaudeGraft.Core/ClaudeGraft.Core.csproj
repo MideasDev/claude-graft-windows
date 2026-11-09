@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>ClaudeGraft.Core</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- The sidebar storage helper's script, kept as a file of its own so the suite can run it with Node. -->
+    <EmbeddedResource Include="Sidebar\sidebar-storage.js" LogicalName="ClaudeGraft.Core.Sidebar.sidebar-storage.js" />
+    <InternalsVisibleTo Include="ClaudeGraft.Tests" />
+  </ItemGroup>
+</Project>

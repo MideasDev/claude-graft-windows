@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>ClaudeGraft</RootNamespace>
+    <AssemblyName>ClaudeGraft</AssemblyName>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationVisualStyles>true</ApplicationVisualStyles>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- No designer here: every control is built in code. -->
+    <!-- WFO1000: no designer here, every control is built in code. MSB3277: WebView2 ships a WPF part this app never loads. -->
+    <NoWarn>$(NoWarn);WFO1000;MSB3277</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClaudeGraft.Core\ClaudeGraft.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
+  </ItemGroup>
+</Project>
